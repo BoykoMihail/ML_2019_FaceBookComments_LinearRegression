@@ -11,6 +11,10 @@
                    displayName="Файлы заголовков"
                    projectFiles="true">
       <itemPath>LinearRegression.h</itemPath>
+      <itemPath>Metric.h</itemPath>
+      <itemPath>R2_metric.h</itemPath>
+      <itemPath>RMSE_metric.h</itemPath>
+      <itemPath>Statistic.h</itemPath>
       <itemPath>rapidcsv.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
@@ -29,6 +33,9 @@
       <itemPath>Makefile</itemPath>
     </logicalFolder>
   </logicalFolder>
+  <sourceRootList>
+    <Elem>../ML_Facebook_LinearRegression/ML_2019_FaceBookComments_LinearRegression/lib/Eigen</Elem>
+  </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
     <conf name="Debug" type="1">
@@ -42,6 +49,14 @@
       <item path="LinearRegression.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="LinearRegression.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Metric.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="R2_metric.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="RMSE_metric.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Statistic.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -71,6 +86,14 @@
       <item path="LinearRegression.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="LinearRegression.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Metric.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="R2_metric.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="RMSE_metric.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Statistic.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
       </item>

@@ -574,7 +574,7 @@ namespace rapidcsv
       Converter<T> converter(mConverterParams);
       for (auto itCol = mData.at(rowIdx).begin(); itCol != mData.at(rowIdx).end(); ++itCol)
       {
-        if (std::distance(mData.at(rowIdx).begin(), itCol) > mLabelParams.mRowNameIdx)
+      //  if (std::distance(mData.at(rowIdx).begin(), itCol) > mLabelParams.mRowNameIdx)
         {
           T val;
           converter.ToVal(*itCol, val);

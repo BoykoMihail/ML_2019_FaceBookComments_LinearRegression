@@ -10,198 +10,180 @@
 #include <typeinfo>
 #include <vector>
 #include "LinearRegression.h"
+#include "Statistic.h"
+#include "RMSE_metric.h"
+#include "R2_metric.h"
 
-using namespace std;  
+using namespace std;
 
-    LinearRegression::LinearRegression(std::vector<std::vector<double>> &x, std::vector<int> &label){
-        
-        
-        this->regul = Regularization::NONE ;
-        this->alpha = 0.8;
-        this->epsilon = 0.00000000001;
-        this->numEpoh = 10;
-    
-        srand(time(NULL));
-        this->mExamples = label.size();
-        this->nFeatures = x[0].size();
-        this->X_data = x;
-        
-        this->Y_label = label;
-        double labelMean = this->findeMean(Y_label);
-        double labelSig = this->findeSigma(Y_label, labelMean);
-        for (int i=0; i<Y_label.size(); ++i){
-            if(labelSig > 0 && fabs(Y_label[i] - labelMean) > 3*labelSig) {
-                Y_label[i] = labelMean;
+LinearRegression::LinearRegression(double alpha, int numEpoh, Regularization regul) {
+
+    this->regul = regul;
+    this->alpha = alpha;
+    this->numEpoh = numEpoh;
+}
+
+void LinearRegression::normVectro(std::vector<std::vector<double>> &v) {
+
+    for (int i = 0; i < v[0].size() - 1; ++i) {
+        std::vector<double> ex(0);
+        for (int j = 0; j < v.size(); ++j) {
+            ex.push_back(v[j][i]);
+        }
+
+        double m = 0;
+        double sig = 0;
+
+        Statistic::findeStatistic(ex, m, sig);
+
+        for (int j = 0; j < v.size(); ++j) {
+            if (sig != 0) {
+                v[j][i] = (v[j][i] - m) / sig;
+            } else {
+                v[j][i] = (v[j][i] - m);
+            }
+            if (sig > 0 && fabs(v[j][i] - m) > 3 * sig) {
+                v[j][i] = m;
             }
         }
-        this->W = vector<double>(nFeatures);
-        for(int i = 0; i<nFeatures; i++){
-            double temp = ((double) rand() / (RAND_MAX)) ;
-            W[i] = (temp);
-        }
-        normVectro(X_data);
-        
+    }
+}
+
+double LinearRegression::predict_value(const vector<double>& ntheta, const vector<double>& features) {
+    double sum = 0.0;
+    for (int i = 0; i < features.size(); ++i) {
+        sum += ntheta[i] * features[i];
     }
 
-    
-    double LinearRegression::findeMean(const std::vector<double> &v){
-        
-        float summOfElements = 0;
-        for (int i = 0; i < v.size(); ++i){
-            summOfElements += v[i];
-        }
-        return summOfElements/v.size();
-    }
-    
-    double LinearRegression::findeMean(const std::vector<int> &v){
-        
-        float summOfElements = 0;
-        for (int i = 0; i < v.size(); ++i){
-            summOfElements += v[i];
-        }
-        return summOfElements/v.size();
-    }
+    return sum;
+}
 
-    double LinearRegression::findeSigma(const std::vector<double> &v, double m1){
+vector<double> LinearRegression::gradientDescent(std::vector<std::vector<double>> &X, const std::vector<int> &Y) {
 
-        double sum = 0;
-        for (int i = 0; i < v.size(); i++){
-            sum += (v[i] - m1)*(v[i] - m1);
-        }
-        sum /= v.size();
-        return sqrt(sum);
+    normVectro(X);
 
-    }
-    
-    double LinearRegression::findeSigma(const std::vector<int> &v, double m1){
+    int k = 0;
+    double lastDiff = 0;
+    while (k < numEpoh) {
+        vector<double> newW = this->W;
 
-        double sum = 0;
-        for (int i = 0; i < v.size(); i++){
-            sum += (v[i] - m1)*(v[i] - m1);
-        }
-        sum /= v.size();
-        return sqrt(sum);
-    }
-    
-
-    void LinearRegression::normVectro(std::vector<std::vector<double>> &v){
-
-        for(int i = 0; i<v[0].size()-1; ++i){
-            std::vector<double> ex(0);
-            for(int j=0; j<v.size(); ++j){
-                ex.push_back(v[j][i]);
-            }
-            float m = findeMean(ex);
-            float sig = findeSigma(ex, m);
-            for (int j=0; j<v.size(); ++j){
-                if (sig != 0){
-                    v[j][i] = (v[j][i] - m)/sig;
-                } else {
-                    v[j][i] = (v[j][i] - m);
+        for (int i = 0; i < X.size(); ++i) {
+            //alpha/=(i+1);
+            double current_predict_value = predict_value(newW, X[i]);
+            double diff = (Y[i] - current_predict_value) / sqrt((Y[i] - current_predict_value)*(Y[i] - current_predict_value));
+            diff *= alpha;
+            for (unsigned j = 0; j < X[0].size(); ++j) {
+                double tete = 0 * newW[j];
+                switch (regul) {
+                    case Regularization::NONE:
+                        tete = 0;
+                        break;
+                    case Regularization::L1_REGULARIZATION:
+                        if (newW[j] > 0) {
+                            tete = 0.009;
+                        } else if (newW[j] < 0) {
+                            tete = -0.009;
+                        }
+                        break;
+                    case Regularization::L2_REGULARIZATION:
+                        tete = 0.6 * newW[j];
+                        break;
                 }
-                if(sig > 0 && fabs(v[j][i] - m) > 3*sig) {
-                    v[j][i] = m;
-                }
-            }
-        }
-    }
-    
-    double LinearRegression::H(vector<double>& ntheta, vector<double>& features){
-        double sum = 0.0;
-            for (int i = 0; i < features.size(); i++){
-                sum += ntheta[i]*features[i];
-            }
-            
-            return sum;
-    }
-    
-    
-    
-    vector<double> LinearRegression::gradientDescent(){
-        bool converge = true;
-        int debug = 0;
-        int k = 0;
-        while (converge) {
-            
-            vector<double> newW = this->W;
-            k++;
-            
-            for (int i = 0; i < mExamples; i++){ 
-                
-                alpha/=(i+1);
-                double HH = H(newW, X_data[i]);
-                double diff = ( Y_label[i] - HH) / sqrt((Y_label[i] - HH)*(Y_label[i] - HH)) ;
-                diff *= alpha;
-                for (unsigned j = 0; j < nFeatures; j++){
-                    double tete = 0*newW[j];
-                    newW[j] += ((diff * this->X_data[j][i])/Y_label.size() + tete);
-                }
-                W = newW;
-//                if (i%2500 == 0) {
-//                    auto Y_pred = this->predict(X_data);
-//                    double result = this->calRMSE(Y_pred, Y_label); 
-//                    double result2 = this->calR2(Y_pred, Y_label); 
-//                    cout<< "result Rmse  " << i << " = " << result << endl; 
-//                     cout<< "result R2 trening " << i << " = " << result2 << endl << endl; 
-//                }
-            }
-            converge = true;
-            for (unsigned i = 0; i < W.size(); i++){
-                converge = (fabs(W[i]-newW[i]) > epsilon) && k<numEpoh;
+                newW[j] += ((diff * X[i][j]) / Y.size() - tete);
             }
             W = newW;
+//            auto Y_pred = this->predict(X);
+//            double currentLost = RMSE_metric::calculateMetric(Y_pred, Y);
+            if (lastDiff*diff <= 0){
+                alpha *= 0.9999999 ;
+                lastDiff = diff;
+            } else {
+                alpha *=1.0000001;
+            }
             
+//                            if (i%2500 == 0) {
+//                                cout<<" alpha = "<<alpha<<endl;
+//                                auto Y_pred = this->predict(X);
+//                                double result_RMSE_test = RMSE_metric::calculateMetric(Y_pred, Y); 
+//                                double result_R2_test = R2_metric::calculateMetric(Y_pred, Y);  
+//                                cout<< "result Rmse  " << i << " = " << result_RMSE_test << endl; 
+//                                 cout<< "result R2 trening " << i << " = " << result_R2_test << endl << endl; 
+//                            }
         }
-//         for (int i = 0; i < W.size(); i++)
-//            {
-//                cout << " W[i] = " << W[i] << " i = " << i ;
-//          
-//            }
-//        cout<<endl;
-        return W;
+        ++k;
     }
-    
-    
-    
-    void LinearRegression::fit(){
-        this->gradientDescent();
-    }
-    
-    
-    
-    std::vector<int> LinearRegression::predict(std::vector< std::vector<double>> X_test){
+    //         for (int i = 0; i < W.size(); i++)
+    //            {
+    //                cout << " W[i] = " << W[i] << " i = " << i ;
+    //          
+    //            }
+    //        cout<<endl;
+    return W;
+}
 
-        normVectro(X_test);
-        std::vector<int> predict_Y(0);
-        for(int i = 0; i<X_test.size(); i++){
-            predict_Y.push_back(H(W, X_test[i]));
+void LinearRegression::fit(const std::vector<std::vector<double>> &X, const std::vector<int> &Y) {
+
+    srand(time(NULL));
+
+    std::vector<std::vector<double>> new_X(0);
+    for (int i = 0; i < X.size(); ++i) {
+        std::vector<double> t(0);
+        for (int j = 0; j < X[i].size(); ++j) {
+            t.push_back(X[i][j]);
         }
-        return predict_Y;
+        new_X.push_back(t);
     }
-    
-    
-    double LinearRegression::calRMSE(const std::vector<int> Y_pred, const std::vector<int> Y_test){
-        
-        double sum = 0;  
-        for(int i = 0; i<Y_pred.size(); i++){
-            sum += (Y_test[i] - Y_pred[i])*(Y_test[i] - Y_pred[i]);
-        }
-        return sqrt(sum/Y_pred.size());
+    //        
+    //        std::vector<std::vector<double>> new_X(0);
+    //        for(int i = 0; i<X.size(); ++i ){
+    //            std::vector<double> t(0);
+    //            for(int j = 0; j<X[i].size(); ++j){
+    //                if(X[i][j] > 0){
+    //                    t.push_back(log(X[i][j]));
+    //                } else if(X[i][j] < 0) {
+    //                    t.push_back(-log(-X[i][j]));
+    //                }else {
+    //                    t.push_back(X[i][j]);
+    //                }
+    //            }
+    //            new_X.push_back(t);
+    //        }
+    //        std::vector<int> new_Y(Y.size());
+    //        for(int i = 0; i<Y.size(); ++i ){
+    //            new_Y[i] = log(Y[i]);
+    //        }
+
+    this->W = vector<double>(X[0].size());
+    for (int i = 0; i < X[0].size(); i++) {
+        double temp = ((double) rand() / (RAND_MAX));
+        //if(temp<0.5){temp+=0.5;}
+        W[i] = (temp);
     }
-  
-    
-    double LinearRegression::calR2(const std::vector<int> Y_pred, const std::vector<int> Y_test){
-        
-        double sum_Up = 0;    
-        for(int i = 0; i<Y_pred.size(); i++){
-            sum_Up += ( Y_test[i] - Y_pred[i])*( Y_test[i] - Y_pred[i]);
+
+    this->gradientDescent(new_X, Y);
+
+
+}
+
+std::vector<int> LinearRegression::predict(const std::vector< std::vector<double>> X_test) {
+
+    std::vector<std::vector<double>> new_X(0);
+    for (int i = 0; i < X_test.size(); ++i) {
+        std::vector<double> t(0);
+        for (int j = 0; j < X_test[i].size(); ++j) {
+            t.push_back(X_test[i][j]);
         }
-        double sum_down = 0;
-        double Y_mean =  this->findeMean(Y_test);
-        for(int i = 0; i<Y_pred.size(); i++){
-            sum_down += ( Y_test[i] - Y_mean)*( Y_test[i] - Y_mean);
-        }
-        return 1 - (sum_Up/sum_down);
+        new_X.push_back(t);
     }
-   
-    
+
+    normVectro(new_X);
+
+    std::vector<int> predict_Y(0);
+    for (int i = 0; i < new_X.size(); i++) {
+        predict_Y.push_back(predict_value(W, new_X[i]));
+    }
+    return predict_Y;
+}
+
+
+

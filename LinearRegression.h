@@ -18,28 +18,22 @@ enum Regularization
 
 class LinearRegression {
 private:
-    std::vector<std::vector<double>> X_data;
-    std::vector<int> Y_label;
     std::vector<double> W;
-    unsigned mExamples, nFeatures;
     
     Regularization regul;
     double alpha;
-    double epsilon;
     int numEpoh;
-public:
-    LinearRegression(std::vector<std::vector<double>> &x, std::vector<int> &label);
+    
+    double predict_value(const std::vector<double>& ntheta,const std::vector<double>& features);
     void normVectro(std::vector<std::vector<double>> &v);
-    double findeMean(const std::vector<double> &v);
-    double findeMean(const std::vector<int> &v);
-    double findeSigma(const std::vector<double> &v, double m1);
-    double findeSigma(const std::vector<int> &v, double m1);
-    void fit();
+    std::vector<double> gradientDescent(std::vector<std::vector<double>> &X,const std::vector<int> &Y);
+    
+public:
+    
+    LinearRegression(double alpha, int numEpoh, Regularization regul );
+   
+    void fit(const std::vector<std::vector<double>> &X,const std::vector<int> &Y);
     std::vector<int> predict(const std::vector< std::vector<double>> X_test);
-    double calRMSE(std::vector<int> Y_pred, const std::vector<int> Y_test);
-    double calR2(std::vector<int> Y_pred, const std::vector<int> Y_test);
-    double H(std::vector<double>& ntheta, std::vector<double>& features);
-    std::vector<double> gradientDescent();
     
     void setAlpha(double newAlpha){
         this->alpha = newAlpha;
@@ -47,11 +41,12 @@ public:
     void setRegul(Regularization newRegul){
         this->regul = newRegul;
     }
-    void setEpsilon(double newEpsilon){
-        this->epsilon = newEpsilon;
-    }
     void setNumEpoh(double newNumEpoh){
         this->numEpoh = newNumEpoh;
+    }
+    
+    std::vector<double> getW(){
+        return this->W;
     }
 };
 
