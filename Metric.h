@@ -13,7 +13,9 @@
 
 class Metric {
 public:
-    static double calculateMetric(const std::vector<int> Y_pred, const std::vector<int> Y_test){};
+
+    static double calculateMetric(const std::vector<int> Y_pred, const std::vector<int> Y_test) {
+    };
 private:
 
 };

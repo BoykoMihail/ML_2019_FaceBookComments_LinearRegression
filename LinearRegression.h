@@ -17,8 +17,7 @@ using Eigen::VectorXd;
 #ifndef LINEARREGRESSION_H
 #define	LINEARREGRESSION_H
 
-enum Regularization
-{
+enum Regularization {
     NONE,
     L2_REGULARIZATION,
     L1_REGULARIZATION
@@ -27,36 +26,38 @@ enum Regularization
 class LinearRegression {
 private:
     VectorXd W;
-    
+
     Regularization regul;
     double learning_rate;
     int numEpoh;
     int bach_size;
-    
-    VectorXd predict_value(const VectorXd &ntheta,const MatrixXd &features);
+
+    VectorXd predict_value(const VectorXd &ntheta, const MatrixXd &features);
     void normVectro(MatrixXd &v);
-    VectorXd gradientDescent(MatrixXd &X,VectorXd &Y);
-    
+    VectorXd gradientDescent(MatrixXd &X, VectorXd &Y);
+
 public:
-    
-    LinearRegression(double alpha, int numEpoh, int bach_size, Regularization regul );
-   
-    void fit(const std::vector<std::vector<double>> &X,const std::vector<double> &Y);
+
+    LinearRegression(double alpha, int numEpoh, int bach_size, Regularization regul);
+
+    void fit(const std::vector<std::vector<double>> &X, const std::vector<double> &Y);
     std::vector<double> predict(const std::vector< std::vector<double>> X_test);
-    
-    void setAlpha(double newAlpha){
+
+    void setAlpha(double newAlpha) {
         this->learning_rate = learning_rate;
     }
-    void setRegul(Regularization newRegul){
+
+    void setRegul(Regularization newRegul) {
         this->regul = newRegul;
     }
-    void setNumEpoh(double newNumEpoh){
+
+    void setNumEpoh(double newNumEpoh) {
         this->numEpoh = newNumEpoh;
     }
-    
-    std::vector<double> getW(){
+
+    std::vector<double> getW() {
         std::vector<double> w(0);
-        for(int i= 0; i<W.size(); ++i){
+        for (int i = 0; i < W.size(); ++i) {
             w.push_back(W(i));
         }
         return w;

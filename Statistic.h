@@ -17,27 +17,28 @@ using Eigen::VectorXd;
 
 class Statistic {
 public:
-    static void findeStatistic(const VectorXd &v,  double &mean, double &sig ){
+
+    static void findeStatistic(const VectorXd &v, double &mean, double &sig) {
 
         float summOfElements = 0;
         float summOfSquareElements = 0;
-        for (int i = 0; i < v.size(); ++i){
-            summOfSquareElements += v(i)*v(i);
+        for (int i = 0; i < v.size(); ++i) {
+            summOfSquareElements += v(i) * v(i);
         }
         mean = v.mean();
-        sig = sqrt(summOfSquareElements/v.size() - mean*mean);
+        sig = sqrt(summOfSquareElements / v.size() - mean * mean);
     }
-    
-    static void findeStatistic(const vector<double> &v,  double &mean, double &sig ){
+
+    static void findeStatistic(const vector<double> &v, double &mean, double &sig) {
 
         float summOfElements = 0;
         float summOfSquareElements = 0;
-        for (int i = 0; i < v.size(); ++i){
+        for (int i = 0; i < v.size(); ++i) {
             summOfElements += v[i];
-            summOfSquareElements += v[i]*v[i];
+            summOfSquareElements += v[i] * v[i];
         }
-        mean = summOfElements/v.size();
-        sig = sqrt(summOfSquareElements/v.size() - mean*mean);
+        mean = summOfElements / v.size();
+        sig = sqrt(summOfSquareElements / v.size() - mean * mean);
     }
 
 };
