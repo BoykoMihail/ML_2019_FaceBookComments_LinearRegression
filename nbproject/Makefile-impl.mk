@@ -24,7 +24,7 @@ CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}
 
 
 # Project Name
-PROJECTNAME=FaceBookFirstHW
+PROJECTNAME=ML_2019_FaceBookComments_LinearRegression
 
 # Active Configuration
 DEFAULTCONF=Debug

@@ -9,19 +9,19 @@ CND_DISTDIR=dist
 # Debug configuration
 CND_PLATFORM_Debug=GNU-Linux-x86
 CND_ARTIFACT_DIR_Debug=dist/Debug/GNU-Linux-x86
-CND_ARTIFACT_NAME_Debug=facebookfirsthw
-CND_ARTIFACT_PATH_Debug=dist/Debug/GNU-Linux-x86/facebookfirsthw
+CND_ARTIFACT_NAME_Debug=ml_2019_facebookcomments_linearregression
+CND_ARTIFACT_PATH_Debug=dist/Debug/GNU-Linux-x86/ml_2019_facebookcomments_linearregression
 CND_PACKAGE_DIR_Debug=dist/Debug/GNU-Linux-x86/package
-CND_PACKAGE_NAME_Debug=facebookfirsthw.tar
-CND_PACKAGE_PATH_Debug=dist/Debug/GNU-Linux-x86/package/facebookfirsthw.tar
+CND_PACKAGE_NAME_Debug=ml2019facebookcommentslinearregression.tar
+CND_PACKAGE_PATH_Debug=dist/Debug/GNU-Linux-x86/package/ml2019facebookcommentslinearregression.tar
 # Release configuration
 CND_PLATFORM_Release=GNU-Linux-x86
 CND_ARTIFACT_DIR_Release=dist/Release/GNU-Linux-x86
-CND_ARTIFACT_NAME_Release=facebookfirsthw
-CND_ARTIFACT_PATH_Release=dist/Release/GNU-Linux-x86/facebookfirsthw
+CND_ARTIFACT_NAME_Release=ml_2019_facebookcomments_linearregression
+CND_ARTIFACT_PATH_Release=dist/Release/GNU-Linux-x86/ml_2019_facebookcomments_linearregression
 CND_PACKAGE_DIR_Release=dist/Release/GNU-Linux-x86/package
-CND_PACKAGE_NAME_Release=facebookfirsthw.tar
-CND_PACKAGE_PATH_Release=dist/Release/GNU-Linux-x86/package/facebookfirsthw.tar
+CND_PACKAGE_NAME_Release=ml2019facebookcommentslinearregression.tar
+CND_PACKAGE_PATH_Release=dist/Release/GNU-Linux-x86/package/ml2019facebookcommentslinearregression.tar
 #
 # include compiler specific variables
 #

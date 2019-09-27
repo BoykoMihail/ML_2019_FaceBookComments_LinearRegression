@@ -11,12 +11,15 @@
 
 class RMSE_metric : public Metric {
     public:
-        static double calculateMetric(const std::vector<int> Y_pred, const std::vector<int> Y_test){
+        static double calculateMetric(const std::vector<double> Y_pred, const std::vector<double> Y_test){
         
             double sum = 0;  
-            for(int i = 0; i<Y_pred.size(); i++){
-                sum += (Y_test[i] - Y_pred[i])*(Y_test[i] - Y_pred[i]);
-            }
+
+            VectorXd Y_test_vector = VectorXd::Map(Y_test.data(), Y_test.size());
+            VectorXd Y_pred_vector = VectorXd::Map(Y_pred.data(), Y_pred.size());
+            
+            sum += (Y_test_vector - Y_pred_vector).dot(Y_test_vector - Y_pred_vector);
+
             return sqrt(sum/Y_pred.size());
         }
 };

@@ -6,6 +6,14 @@
  */
 
 #include <vector>
+#include <eigen3/Eigen/Core>
+
+using namespace std;
+
+using Eigen::MatrixXd;
+using Eigen::VectorXd;
+
+
 #ifndef LINEARREGRESSION_H
 #define	LINEARREGRESSION_H
 
@@ -18,25 +26,26 @@ enum Regularization
 
 class LinearRegression {
 private:
-    std::vector<double> W;
+    VectorXd W;
     
     Regularization regul;
-    double alpha;
+    double learning_rate;
     int numEpoh;
+    int bach_size;
     
-    double predict_value(const std::vector<double>& ntheta,const std::vector<double>& features);
-    void normVectro(std::vector<std::vector<double>> &v);
-    std::vector<double> gradientDescent(std::vector<std::vector<double>> &X,const std::vector<int> &Y);
+    VectorXd predict_value(const VectorXd &ntheta,const MatrixXd &features);
+    void normVectro(MatrixXd &v);
+    VectorXd gradientDescent(MatrixXd &X,VectorXd &Y);
     
 public:
     
-    LinearRegression(double alpha, int numEpoh, Regularization regul );
+    LinearRegression(double alpha, int numEpoh, int bach_size, Regularization regul );
    
-    void fit(const std::vector<std::vector<double>> &X,const std::vector<int> &Y);
-    std::vector<int> predict(const std::vector< std::vector<double>> X_test);
+    void fit(const std::vector<std::vector<double>> &X,const std::vector<double> &Y);
+    std::vector<double> predict(const std::vector< std::vector<double>> X_test);
     
     void setAlpha(double newAlpha){
-        this->alpha = newAlpha;
+        this->learning_rate = learning_rate;
     }
     void setRegul(Regularization newRegul){
         this->regul = newRegul;
@@ -46,7 +55,11 @@ public:
     }
     
     std::vector<double> getW(){
-        return this->W;
+        std::vector<double> w(0);
+        for(int i= 0; i<W.size(); ++i){
+            w.push_back(W(i));
+        }
+        return w;
     }
 };
 
