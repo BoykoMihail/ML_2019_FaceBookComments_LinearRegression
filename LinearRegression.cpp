@@ -40,11 +40,15 @@ void LinearRegression::normVectro(MatrixXd &v) {
             if (sig != 0) {
                 v(j, i) = (v(j, i) - m) / sig;
             } else {
-                //   v(j,i) = (v(j,i) - m);
+                v(j, i) = 1;
             }
-            if (sig > 0 && fabs(v(j, i) - m) > 3 * sig) {
-                v(j, i) = m;
-            }
+//            if (sig > 0 && fabs(v(j, i) - m) > 3 * sig) {
+//                if (v(j, i) - m > 3 * sig) {
+//                    v(j, i) = m + 3 * sig;
+//                } else if (v(j, i) - m < -(3 * sig)) {
+//                    v(j, i) = m - 3 * sig;
+//                }
+//            }
         }
     }
 }
@@ -59,22 +63,25 @@ VectorXd LinearRegression::gradientDescent(MatrixXd &X, VectorXd &Y) {
 
     normVectro(X);
     int k = 0;
-    double lastDiff = 0;
+    VectorXd lastDiff = VectorXd();
+
     while (k < numEpoh) {
         VectorXd newW = this->W;
-        
-//        PermutationMatrix<Dynamic, Dynamic> perm(Y.size());
-//        perm.setIdentity();
-//        std::random_shuffle(perm.indices().data(), perm.indices().data() + perm.indices().size());
-//        // A_perm = X * perm; // permute columns
-//        MatrixXd X_perm = perm * X; // permute rows
-//        VectorXd Y_perm = perm * Y;
-
+        lastDiff.setZero(bach_size);
+        //        PermutationMatrix<Dynamic, Dynamic> perm(Y.size());
+        //        perm.setIdentity();
+        //        std::random_shuffle(perm.indices().data(), perm.indices().data() + perm.indices().size());
+        //        // A_perm = X * perm; // permute columns
+        //        MatrixXd X_perm = perm * X; // permute rows
+        //        VectorXd Y_perm = perm * Y;
+//        if (k % 100 == 0)
+//            cout << "learning_rate = " << learning_rate << endl << endl;
         for (int i = 0; i < X.rows(); i += this->bach_size) {
 
             MatrixXd bachX;
             VectorXd bachY;
             if (i + bach_size < X.rows()) {
+
                 bachX = X.block(i, 0, bach_size, X.cols());
                 bachY = Y.block(i, 0, bach_size, 1);
             } else {
@@ -86,6 +93,8 @@ VectorXd LinearRegression::gradientDescent(MatrixXd &X, VectorXd &Y) {
             VectorXd current_predict_value = predict_value(newW, bachX);
             VectorXd diff = (bachY - current_predict_value).array() / (((bachY - current_predict_value).array()*(bachY - current_predict_value).array()).sqrt()).array();
             diff = diff.array() * learning_rate;
+            //            cout<<"diff size = "<<diff.size()<<endl;
+            //            cout<<"learning_rate = "<<learning_rate<<endl<<endl;
             //                double tete = 0 * newW(j);
             //                switch (regul) {
             //                    case Regularization::NONE:
@@ -105,12 +114,20 @@ VectorXd LinearRegression::gradientDescent(MatrixXd &X, VectorXd &Y) {
             newW = (newW.array() + ((diff.transpose() * bachX) / bachY.size()).transpose().array()).transpose();
             W = newW;
 
-            //            if (lastDiff*diff <= 0){
-            //                learning_rate *= 0.9999999 ;
-            //                lastDiff = diff;
-            //            } else {
-            //                learning_rate *=1.0000001;
-            //            }
+            srand(time(NULL));
+            int indexCurrent = rand() % diff.size();
+
+//            if (lastDiff[indexCurrent] * diff[indexCurrent] <= 0) {
+              //  if (learning_rate > 0.0015){
+                    learning_rate *= 0.99999999;
+               // } else {
+                   // learning_rate *= 0.9999999;
+               // }
+                lastDiff = diff;
+//            } else {
+//                learning_rate *= 1.00000001;
+//                lastDiff = diff;
+//            }
         }
         ++k;
     }

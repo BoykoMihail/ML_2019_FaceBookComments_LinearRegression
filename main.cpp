@@ -36,6 +36,8 @@ double rountFor(double a, int count = 6) {
 int main(int argc, char** argv) {
 
     cout << "Hellow World!" << endl;
+    
+    
 
     rapidcsv::Document doc("/home/boyko_mihail/NetBeansProjects/FaceBookFirstHW/Dataset/Dataset/Training/Features_Variant_1.csv");
 
@@ -54,8 +56,10 @@ int main(int argc, char** argv) {
         All.push_back(newX);
     }
 
-    auto rng = std::default_random_engine{};
-    shuffle(All.begin(), All.end(), rng);
+    std::random_device rd;
+    std::mt19937 g(rd());
+ 
+    std::shuffle(All.begin(), All.end(), g);
 
 
     std::vector<std::vector<double>> X(0);
@@ -81,23 +85,36 @@ int main(int argc, char** argv) {
         Y_train.clear();
         Y_test.clear();
 
+        double m = 0;
+        double sig = 0;
+        Statistic::findeStatistic(Y, m, sig);
+
         for (int j = 0; j < X.size(); j++) {
+
             if (j < crossValCount * i || j >= crossValCount * (i + 1)) {
                 X_train.push_back(X[j]);
-                Y_train.push_back(Y[j]);
+//                if (abs(Y[j] - m) < 3 * sig) {
+                    Y_train.push_back(Y[j]);
+//                } else {
+//                    if (Y[j] - m > 3 * sig) {
+//                        Y_train.push_back( m + 3 * sig );
+//                    } else if (Y[j] - m < -(3 * sig)) {
+//                        Y_train.push_back( m - 3 * sig );
+//                    }
+//                }
             } else {
                 X_test.push_back(X[j]);
                 Y_test.push_back(Y[j]);
             }
         }
 
-        LinearRegression model(0.001, 1250, 1000, Regularization::NONE);
+        LinearRegression model(0.2, 220, 1000, Regularization::NONE);
         clock_t start2 = clock();
         model.fit(X_train, Y_train);
         clock_t end2 = clock();
-    
+
         double seconds2 = (double) (end2 - start2) / CLOCKS_PER_SEC;
-        cout<<" time to fit = "<<seconds2<<" seconds"<<endl<<endl;
+        cout << " time to fit = " << seconds2 << " seconds" << endl << endl;
 
 
         auto Y_pred = model.predict(X_train);
@@ -121,9 +138,9 @@ int main(int argc, char** argv) {
         all_W.push_back(model.getW());
     }
     clock_t end = clock();
-    
+
     double seconds = (double) (end - start) / CLOCKS_PER_SEC;
-    cout<<" time = "<<seconds<<" seconds"<<endl<<endl;
+    cout << " time = " << seconds << " seconds" << endl << endl;
 
     double R2_M = 0;
     double RMSE_M = 0;
@@ -141,28 +158,28 @@ int main(int argc, char** argv) {
     cout << "all RMSE Sigma = " << RMSE_sig << endl;
     cout << "all R2 Mean = " << R2_M << endl;
     cout << "all R2 Sigma = " << R2_sig << endl;
-//
-//
-//    std::ofstream myfile;
-//    myfile.open("/home/boyko_mihail/NetBeansProjects/ML_Facebook_LinearRegression/ML_2019_FaceBookComments_LinearRegression/Result_Table.csv");
-//    myfile << ",1,2,3,4,5,E,SD,\n";
-//    myfile << "RMSE," << (RMSE_results[0]) << "," << (RMSE_results[1]) << "," << (RMSE_results[2]) << "," << (RMSE_results[3]) << "," << (RMSE_results[4]) << "," << RMSE_M << "," << RMSE_sig << ",\n";
-//    myfile << "R^2," << (R2_results[0]) << "," << (R2_results[1]) << "," << (R2_results[2]) << "," << (R2_results[3]) << "," << (R2_results[4]) << "," << R2_M << "," << R2_sig << ",\n";
-//
-//
-//    for (int i = 0; i < all_W[0].size(); i++) {
-//        double W_i_M = 0;
-//        double W_i_Sig = 0;
-//        for (int k = 0; k < all_W.size(); ++k) {
-//            W_i_M += all_W[k][i];
-//            W_i_Sig += all_W[k][i] * all_W[k][i];
-//        }
-//        W_i_M = W_i_M / all_W.size();
-//        W_i_Sig = sqrt(W_i_Sig / all_W.size() - W_i_M * W_i_M);
-//        myfile << "W[" << i << "]," << all_W[0][i] << "," << all_W[1][i] << "," << all_W[2][i] << "," << all_W[3][i] << "," << all_W[4][i] << "," << W_i_M << "," << W_i_Sig << ",\n";
-//    }
-//
-//    myfile.close();
+
+
+    std::ofstream myfile;
+    myfile.open("/home/boyko_mihail/NetBeansProjects/ML_Facebook_LinearRegression/ML_2019_FaceBookComments_LinearRegression/Result_Table_Temp_Batch_1000_5.csv");
+    myfile << ",1,2,3,4,5,E,SD,\n";
+    myfile << "RMSE," << (RMSE_results[0]) << "," << (RMSE_results[1]) << "," << (RMSE_results[2]) << "," << (RMSE_results[3]) << "," << (RMSE_results[4]) << "," << RMSE_M << "," << RMSE_sig << ",\n";
+    myfile << "R^2," << (R2_results[0]) << "," << (R2_results[1]) << "," << (R2_results[2]) << "," << (R2_results[3]) << "," << (R2_results[4]) << "," << R2_M << "," << R2_sig << ",\n";
+
+
+    for (int i = 0; i < all_W[0].size(); i++) {
+        double W_i_M = 0;
+        double W_i_Sig = 0;
+        for (int k = 0; k < all_W.size(); ++k) {
+            W_i_M += all_W[k][i];
+            W_i_Sig += all_W[k][i] * all_W[k][i];
+        }
+        W_i_M = W_i_M / all_W.size();
+        W_i_Sig = sqrt(W_i_Sig / all_W.size() - W_i_M * W_i_M);
+        myfile << "W[" << i << "]," << all_W[0][i] << "," << all_W[1][i] << "," << all_W[2][i] << "," << all_W[3][i] << "," << all_W[4][i] << "," << W_i_M << "," << W_i_Sig << ",\n";
+    }
+
+    myfile.close();
 
     return 0;
 }
