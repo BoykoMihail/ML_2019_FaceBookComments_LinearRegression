@@ -62,11 +62,26 @@ VectorXd LinearRegression::gradientDescent(MatrixXd &X, VectorXd &Y) {
     double lastDiff = 0;
     while (k < numEpoh) {
         VectorXd newW = this->W;
+        
+//        PermutationMatrix<Dynamic, Dynamic> perm(Y.size());
+//        perm.setIdentity();
+//        std::random_shuffle(perm.indices().data(), perm.indices().data() + perm.indices().size());
+//        // A_perm = X * perm; // permute columns
+//        MatrixXd X_perm = perm * X; // permute rows
+//        VectorXd Y_perm = perm * Y;
 
-        for (int i = 0; i < X.rows() - bach_size; i += this->bach_size) {
+        for (int i = 0; i < X.rows(); i += this->bach_size) {
 
-            MatrixXd bachX = X.block(i, 0, bach_size, X.cols());
-            VectorXd bachY = Y.block(i, 0, bach_size, 1);
+            MatrixXd bachX;
+            VectorXd bachY;
+            if (i + bach_size < X.rows()) {
+                bachX = X.block(i, 0, bach_size, X.cols());
+                bachY = Y.block(i, 0, bach_size, 1);
+            } else {
+                bachX = X.block(i, 0, X.rows() - i, X.cols());
+                bachY = Y.block(i, 0, X.rows() - i, 1);
+            }
+
 
             VectorXd current_predict_value = predict_value(newW, bachX);
             VectorXd diff = (bachY - current_predict_value).array() / (((bachY - current_predict_value).array()*(bachY - current_predict_value).array()).sqrt()).array();

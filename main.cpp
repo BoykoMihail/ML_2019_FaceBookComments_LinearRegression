@@ -17,6 +17,7 @@
 #include "RMSE_metric.h"
 #include "R2_metric.h"
 #include "Statistic.h"
+#include <time.h>
 
 using namespace std;
 
@@ -72,7 +73,7 @@ int main(int argc, char** argv) {
     std::vector<double> Y_train(0);
     std::vector<double>Y_test(0);
 
-
+    clock_t start = clock();
     for (int i = 0; i < 5; i++) {
 
         X_train.clear();
@@ -90,9 +91,13 @@ int main(int argc, char** argv) {
             }
         }
 
-        LinearRegression model(0.01, 60, 50, Regularization::NONE);
-
+        LinearRegression model(0.001, 1250, 1000, Regularization::NONE);
+        clock_t start2 = clock();
         model.fit(X_train, Y_train);
+        clock_t end2 = clock();
+    
+        double seconds2 = (double) (end2 - start2) / CLOCKS_PER_SEC;
+        cout<<" time to fit = "<<seconds2<<" seconds"<<endl<<endl;
 
 
         auto Y_pred = model.predict(X_train);
@@ -115,6 +120,10 @@ int main(int argc, char** argv) {
         R2_results.push_back(result_R2_test);
         all_W.push_back(model.getW());
     }
+    clock_t end = clock();
+    
+    double seconds = (double) (end - start) / CLOCKS_PER_SEC;
+    cout<<" time = "<<seconds<<" seconds"<<endl<<endl;
 
     double R2_M = 0;
     double RMSE_M = 0;
@@ -132,28 +141,28 @@ int main(int argc, char** argv) {
     cout << "all RMSE Sigma = " << RMSE_sig << endl;
     cout << "all R2 Mean = " << R2_M << endl;
     cout << "all R2 Sigma = " << R2_sig << endl;
-
-
-    std::ofstream myfile;
-    myfile.open("/home/boyko_mihail/NetBeansProjects/ML_Facebook_LinearRegression/ML_2019_FaceBookComments_LinearRegression/Result_Table.csv");
-    myfile << ",1,2,3,4,5,E,SD,\n";
-    myfile << "RMSE," << (RMSE_results[0]) << "," << (RMSE_results[1]) << "," << (RMSE_results[2]) << "," << (RMSE_results[3]) << "," << (RMSE_results[4]) << "," << RMSE_M << "," << RMSE_sig << ",\n";
-    myfile << "R^2," << (R2_results[0]) << "," << (R2_results[1]) << "," << (R2_results[2]) << "," << (R2_results[3]) << "," << (R2_results[4]) << "," << R2_M << "," << R2_sig << ",\n";
-
-
-    for (int i = 0; i < all_W[0].size(); i++) {
-        double W_i_M = 0;
-        double W_i_Sig = 0;
-        for (int k = 0; k < all_W.size(); ++k) {
-            W_i_M += all_W[k][i];
-            W_i_Sig += all_W[k][i] * all_W[k][i];
-        }
-        W_i_M = W_i_M / all_W.size();
-        W_i_Sig = sqrt(W_i_Sig / all_W.size() - W_i_M * W_i_M);
-        myfile << "W[" << i << "]," << all_W[0][i] << "," << all_W[1][i] << "," << all_W[2][i] << "," << all_W[3][i] << "," << all_W[4][i] << "," << W_i_M << "," << W_i_Sig << ",\n";
-    }
-
-    myfile.close();
+//
+//
+//    std::ofstream myfile;
+//    myfile.open("/home/boyko_mihail/NetBeansProjects/ML_Facebook_LinearRegression/ML_2019_FaceBookComments_LinearRegression/Result_Table.csv");
+//    myfile << ",1,2,3,4,5,E,SD,\n";
+//    myfile << "RMSE," << (RMSE_results[0]) << "," << (RMSE_results[1]) << "," << (RMSE_results[2]) << "," << (RMSE_results[3]) << "," << (RMSE_results[4]) << "," << RMSE_M << "," << RMSE_sig << ",\n";
+//    myfile << "R^2," << (R2_results[0]) << "," << (R2_results[1]) << "," << (R2_results[2]) << "," << (R2_results[3]) << "," << (R2_results[4]) << "," << R2_M << "," << R2_sig << ",\n";
+//
+//
+//    for (int i = 0; i < all_W[0].size(); i++) {
+//        double W_i_M = 0;
+//        double W_i_Sig = 0;
+//        for (int k = 0; k < all_W.size(); ++k) {
+//            W_i_M += all_W[k][i];
+//            W_i_Sig += all_W[k][i] * all_W[k][i];
+//        }
+//        W_i_M = W_i_M / all_W.size();
+//        W_i_Sig = sqrt(W_i_Sig / all_W.size() - W_i_M * W_i_M);
+//        myfile << "W[" << i << "]," << all_W[0][i] << "," << all_W[1][i] << "," << all_W[2][i] << "," << all_W[3][i] << "," << all_W[4][i] << "," << W_i_M << "," << W_i_Sig << ",\n";
+//    }
+//
+//    myfile.close();
 
     return 0;
 }
