@@ -40,15 +40,15 @@ void LinearRegression::normVectro(MatrixXd &v) {
             if (sig != 0) {
                 v(j, i) = (v(j, i) - m) / sig;
             } else {
-                v(j, i) = 1;
+                //  v(j, i) = 1;
             }
-//            if (sig > 0 && fabs(v(j, i) - m) > 3 * sig) {
-//                if (v(j, i) - m > 3 * sig) {
-//                    v(j, i) = m + 3 * sig;
-//                } else if (v(j, i) - m < -(3 * sig)) {
-//                    v(j, i) = m - 3 * sig;
-//                }
-//            }
+            //            if (sig > 0 && fabs(v(j, i) - m) > 3 * sig) {
+            //                if (v(j, i) - m > 3 * sig) {
+            //                    v(j, i) = m + 3 * sig;
+            //                } else if (v(j, i) - m < -(3 * sig)) {
+            //                    v(j, i) = m - 3 * sig;
+            //                }
+            //            }
         }
     }
 }
@@ -74,8 +74,8 @@ VectorXd LinearRegression::gradientDescent(MatrixXd &X, VectorXd &Y) {
         //        // A_perm = X * perm; // permute columns
         //        MatrixXd X_perm = perm * X; // permute rows
         //        VectorXd Y_perm = perm * Y;
-//        if (k % 100 == 0)
-//            cout << "learning_rate = " << learning_rate << endl << endl;
+        //        if (k % 100 == 0)
+        //            cout << "learning_rate = " << learning_rate << endl << endl;
         for (int i = 0; i < X.rows(); i += this->bach_size) {
 
             MatrixXd bachX;
@@ -116,18 +116,16 @@ VectorXd LinearRegression::gradientDescent(MatrixXd &X, VectorXd &Y) {
 
             srand(time(NULL));
             int indexCurrent = rand() % diff.size();
-
-//            if (lastDiff[indexCurrent] * diff[indexCurrent] <= 0) {
-              //  if (learning_rate > 0.0015){
+            if (learning_rate > 0.0000000015) {
+                if (lastDiff[indexCurrent] * diff[indexCurrent] <= 0) {
+//
                     learning_rate *= 0.99999999;
-               // } else {
-                   // learning_rate *= 0.9999999;
-               // }
-                lastDiff = diff;
-//            } else {
-//                learning_rate *= 1.00000001;
-//                lastDiff = diff;
-//            }
+                    lastDiff = diff;
+                } else {
+                    learning_rate *= 1.00000001;
+                    lastDiff = diff;
+                }
+            }
         }
         ++k;
     }

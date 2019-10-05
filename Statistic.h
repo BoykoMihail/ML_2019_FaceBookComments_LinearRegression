@@ -39,6 +39,7 @@ public:
         }
         mean = summOfElements / v.size();
         sig = sqrt(summOfSquareElements / v.size() - mean * mean);
+
     }
 
 };

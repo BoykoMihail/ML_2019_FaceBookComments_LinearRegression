@@ -39,7 +39,7 @@ int main(int argc, char** argv) {
     
     
 
-    rapidcsv::Document doc("/home/boyko_mihail/NetBeansProjects/FaceBookFirstHW/Dataset/Dataset/Training/Features_Variant_1.csv");
+    rapidcsv::Document doc("/home/boyko_mihail/NetBeansProjects/ML_Facebook_LinearRegression/ML_2019_FaceBookComments_LinearRegression/Dataset/Dataset/Training/Features_Variant_1.csv");
 
     int crossValCount = doc.GetRowCount() / 5;
     std::vector<double> RMSE_results(0);
@@ -64,6 +64,8 @@ int main(int argc, char** argv) {
 
     std::vector<std::vector<double>> X(0);
     std::vector<double> Y(0);
+    
+    
     for (int i = 0; i < All.size(); ++i) {
         std::vector<double> newX = All[i];
         Y.push_back(newX.back());
@@ -85,9 +87,7 @@ int main(int argc, char** argv) {
         Y_train.clear();
         Y_test.clear();
 
-        double m = 0;
-        double sig = 0;
-        Statistic::findeStatistic(Y, m, sig);
+        
 
         for (int j = 0; j < X.size(); j++) {
 
@@ -107,8 +107,10 @@ int main(int argc, char** argv) {
                 Y_test.push_back(Y[j]);
             }
         }
-
-        LinearRegression model(0.2, 220, 1000, Regularization::NONE);
+        // BATCH SIZE 60 PARAM = 0.1, 110, 60
+        // BACH SIZE 1000 PARAM = 0.2, 220, 1000
+        // BACH SIZE 1000 PARAM = 0.5, 400, 10000
+        LinearRegression model(0.5, 420, 10000, Regularization::NONE);
         clock_t start2 = clock();
         model.fit(X_train, Y_train);
         clock_t end2 = clock();
@@ -161,7 +163,7 @@ int main(int argc, char** argv) {
 
 
     std::ofstream myfile;
-    myfile.open("/home/boyko_mihail/NetBeansProjects/ML_Facebook_LinearRegression/ML_2019_FaceBookComments_LinearRegression/Result_Table_Temp_Batch_1000_5.csv");
+    myfile.open("/home/boyko_mihail/NetBeansProjects/ML_Facebook_LinearRegression/ML_2019_FaceBookComments_LinearRegression/Result_Table_Temp_Batch_10000_2.csv");
     myfile << ",1,2,3,4,5,E,SD,\n";
     myfile << "RMSE," << (RMSE_results[0]) << "," << (RMSE_results[1]) << "," << (RMSE_results[2]) << "," << (RMSE_results[3]) << "," << (RMSE_results[4]) << "," << RMSE_M << "," << RMSE_sig << ",\n";
     myfile << "R^2," << (R2_results[0]) << "," << (R2_results[1]) << "," << (R2_results[2]) << "," << (R2_results[3]) << "," << (R2_results[4]) << "," << R2_M << "," << R2_sig << ",\n";
