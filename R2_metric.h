@@ -32,7 +32,7 @@ public:
 
         VectorXd one(Y_test_vector.size());
         one.setConstant(Y_mean);
-
+        
         sum_Up += (Y_test_vector - Y_pred_vector).dot((Y_test_vector - Y_pred_vector)); //( Y_test[i] - Y_pred[i])*( Y_test[i] - Y_pred[i]);
         sum_down += (Y_test_vector - one).dot(Y_test_vector - one); //( Y_test[i] - Y_mean)*( Y_test[i] - Y_mean);
         return 1 - (sum_Up / sum_down);

@@ -18,6 +18,7 @@
 #include "R2_metric.h"
 #include "Statistic.h"
 #include <time.h>
+#include <map>
 
 using namespace std;
 
@@ -36,8 +37,8 @@ double rountFor(double a, int count = 6) {
 int main(int argc, char** argv) {
 
     cout << "Hellow World!" << endl;
-    
-    
+
+
 
     rapidcsv::Document doc("/home/boyko_mihail/NetBeansProjects/ML_Facebook_LinearRegression/ML_2019_FaceBookComments_LinearRegression/Dataset/Dataset/Training/Features_Variant_1.csv");
 
@@ -58,18 +59,32 @@ int main(int argc, char** argv) {
 
     std::random_device rd;
     std::mt19937 g(rd());
- 
+
     std::shuffle(All.begin(), All.end(), g);
 
 
     std::vector<std::vector<double>> X(0);
+    std::vector<std::vector<double>> XUpdateFeatures(0);
     std::vector<double> Y(0);
-    
-    
+
+
     for (int i = 0; i < All.size(); ++i) {
         std::vector<double> newX = All[i];
         Y.push_back(newX.back());
         newX.pop_back();
+        int sizeX = newX.size();
+        for (int q = 0; q < sizeX; ++q) {
+            for (int q2 = q; q2 < sizeX; ++q2) {
+                newX.push_back(newX[q] * newX[q2]);
+            }
+        }
+        for (int w = 0; w < 24; ++w) {
+            if (w != newX[38]) {
+                newX.push_back(0);
+            } else {
+                newX.push_back(1);
+            }
+        }
         X.push_back(newX);
     }
 
@@ -79,6 +94,69 @@ int main(int argc, char** argv) {
     std::vector<double> Y_train(0);
     std::vector<double>Y_test(0);
 
+    map <double, double> pXi;
+    map <pair<double, double>, double> pXiYi;
+    map <int, double> HYX;
+    map <double, double> pYi;
+    double HY = 0;
+    map < int, double> IG_YX;
+
+
+    for (int j = 0; j < Y.size(); ++j) {
+        pYi[Y[j]] += 1.0;
+    }
+    for (auto it = pYi.begin(); it != pYi.end(); ++it) {
+        HY += ((*it).second / Y.size()) * log2(((*it).second / Y.size()));
+    }
+    HY *= -1;
+
+    for (int j = 0; j < X[0].size(); ++j) {
+        for (int q = 0; q < X.size(); ++q) {
+            pXi[X[q][j]] += 1.0;
+            pXiYi[pair<double, double>(X[q][j], Y[q])] += 1.0;
+
+        }
+
+        for (auto it = pXi.begin(); it != pXi.end(); ++it) {
+            double tempSumm = 0;
+            for (auto ity = pXiYi.begin(); ity != pXiYi.end(); ++ity) {
+                if ((*ity).first.first == (*it).first) {
+                    tempSumm += ((*ity).second / (*it).second) * log2((*ity).second / (*it).second);
+                }
+            }
+            tempSumm *= -1;
+            HYX[j] += ((*it).second / X.size()) * tempSumm;
+        }
+        //HYX[j] *= -1;
+        pXi.clear();
+        pXiYi.clear();
+    }
+    for (auto it = HYX.begin(); it != HYX.end(); ++it) {
+        IG_YX[(*it).first] = HY - (*it).second;
+    }
+
+    //    auto cmp = [](std::pair<int, double> const & a, std::pair<int, double> const & b){
+    //        return a.second != b.second? a.second < b.second : a.first < b.first;
+    //    };
+    //    std::sort(IG_YX.begin(), IG_YX.end(), cmp);
+
+    for (auto it = IG_YX.begin(); it != IG_YX.end(); ++it) {
+        cout << "IG_YX[" << (*it).first << "] = " << (*it).second << endl;
+    }
+    cout << "HY = " << HY << endl;
+
+    for (int i = 0; i < X.size(); ++i) {
+
+        std::vector<double> newX(0);
+        for (int j = 0; j < X[i].size(); ++j) {
+            if (IG_YX[j] > 0.8 || j == X[i].size() - 1) {
+                newX.push_back(X[i][j]);
+            }
+        }
+        XUpdateFeatures.push_back(newX);
+    }
+    X = XUpdateFeatures;
+
     clock_t start = clock();
     for (int i = 0; i < 5; i++) {
 
@@ -87,30 +165,32 @@ int main(int argc, char** argv) {
         Y_train.clear();
         Y_test.clear();
 
-        
+
 
         for (int j = 0; j < X.size(); j++) {
 
             if (j < crossValCount * i || j >= crossValCount * (i + 1)) {
                 X_train.push_back(X[j]);
-//                if (abs(Y[j] - m) < 3 * sig) {
-                    Y_train.push_back(Y[j]);
-//                } else {
-//                    if (Y[j] - m > 3 * sig) {
-//                        Y_train.push_back( m + 3 * sig );
-//                    } else if (Y[j] - m < -(3 * sig)) {
-//                        Y_train.push_back( m - 3 * sig );
-//                    }
-//                }
+                //                if (abs(Y[j] - m) < 3 * sig) {
+                Y_train.push_back(Y[j]);
+                //                } else {
+                //                    if (Y[j] - m > 3 * sig) {
+                //                        Y_train.push_back( m + 3 * sig );
+                //                    } else if (Y[j] - m < -(3 * sig)) {
+                //                        Y_train.push_back( m - 3 * sig );
+                //                    }
+                //                }
             } else {
                 X_test.push_back(X[j]);
                 Y_test.push_back(Y[j]);
             }
         }
+
+
         // BATCH SIZE 60 PARAM = 0.1, 110, 60
         // BACH SIZE 1000 PARAM = 0.2, 220, 1000
         // BACH SIZE 1000 PARAM = 0.5, 400, 10000
-        LinearRegression model(0.5, 420, 10000, Regularization::NONE);
+        LinearRegression model(0.2, 250, 1000, Regularization::NONE);
         clock_t start2 = clock();
         model.fit(X_train, Y_train);
         clock_t end2 = clock();
@@ -163,7 +243,7 @@ int main(int argc, char** argv) {
 
 
     std::ofstream myfile;
-    myfile.open("/home/boyko_mihail/NetBeansProjects/ML_Facebook_LinearRegression/ML_2019_FaceBookComments_LinearRegression/Result_Table_Temp_Batch_10000_2.csv");
+    myfile.open("/home/boyko_mihail/NetBeansProjects/ML_Facebook_LinearRegression/ML_2019_FaceBookComments_LinearRegression/Features_enginering_2.csv");
     myfile << ",1,2,3,4,5,E,SD,\n";
     myfile << "RMSE," << (RMSE_results[0]) << "," << (RMSE_results[1]) << "," << (RMSE_results[2]) << "," << (RMSE_results[3]) << "," << (RMSE_results[4]) << "," << RMSE_M << "," << RMSE_sig << ",\n";
     myfile << "R^2," << (R2_results[0]) << "," << (R2_results[1]) << "," << (R2_results[2]) << "," << (R2_results[3]) << "," << (R2_results[4]) << "," << R2_M << "," << R2_sig << ",\n";

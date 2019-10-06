@@ -151,7 +151,7 @@ void LinearRegression::fit(const std::vector<std::vector<double>> &X, const std:
 
     this->W = VectorXd();
     W.setRandom(X[0].size());
-
+    
     this->gradientDescent(X_Matrix, Y_Vector);
 
 }
