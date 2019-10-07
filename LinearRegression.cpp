@@ -2,6 +2,8 @@
 #include <cassert>
 #include <cmath>
 #include <ctime>
+#include <time.h>
+#include <random>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -64,29 +66,35 @@ VectorXd LinearRegression::gradientDescent(MatrixXd &X, VectorXd &Y) {
     normVectro(X);
     int k = 0;
     VectorXd lastDiff = VectorXd();
+    
+    std::vector<int> indexes(X.rows());
+    for(int i=0; i<X.rows(); ++i){
+        indexes[i] = i;
+    }
+        
+    
 
     while (k < numEpoh) {
+        
+        std::random_device rd;
+        std::mt19937 g(rd());
+
+        std::shuffle(indexes.begin(), indexes.end(), g);
+    
         VectorXd newW = this->W;
         lastDiff.setZero(bach_size);
-        //        PermutationMatrix<Dynamic, Dynamic> perm(Y.size());
-        //        perm.setIdentity();
-        //        std::random_shuffle(perm.indices().data(), perm.indices().data() + perm.indices().size());
-        //        // A_perm = X * perm; // permute columns
-        //        MatrixXd X_perm = perm * X; // permute rows
-        //        VectorXd Y_perm = perm * Y;
-        //        if (k % 100 == 0)
-        //            cout << "learning_rate = " << learning_rate << endl << endl;
+        
         for (int i = 0; i < X.rows(); i += this->bach_size) {
 
             MatrixXd bachX;
             VectorXd bachY;
-            if (i + bach_size < X.rows()) {
+            if (indexes[i] + bach_size < X.rows()) {
 
-                bachX = X.block(i, 0, bach_size, X.cols());
-                bachY = Y.block(i, 0, bach_size, 1);
+                bachX = X.block(indexes[i], 0, bach_size, X.cols());
+                bachY = Y.block(indexes[i], 0, bach_size, 1);
             } else {
-                bachX = X.block(i, 0, X.rows() - i, X.cols());
-                bachY = Y.block(i, 0, X.rows() - i, 1);
+                bachX = X.block(indexes[i], 0, X.rows() - indexes[i], X.cols());
+                bachY = Y.block(indexes[i], 0, X.rows() - indexes[i], 1);
             }
 
 
@@ -115,14 +123,20 @@ VectorXd LinearRegression::gradientDescent(MatrixXd &X, VectorXd &Y) {
             W = newW;
 
             srand(time(NULL));
-            int indexCurrent = rand() % diff.size();
-            if (learning_rate > 0.0000000015) {
+            int indexCurrent = 0;
+            if (lastDiff.size() == diff.size()){
+                indexCurrent = rand() % diff.size();
+            } else if (lastDiff.size() < diff.size() ){
+                indexCurrent = rand() % lastDiff.size();
+            }
+          
+            if (learning_rate > 0.000000000015) {
                 if (lastDiff[indexCurrent] * diff[indexCurrent] <= 0) {
 //
-                    learning_rate *= 0.99999999;
+                    learning_rate *= 0.9999999;
                     lastDiff = diff;
                 } else {
-                    learning_rate *= 1.00000001;
+                    learning_rate *= 1.0000001;
                     lastDiff = diff;
                 }
             }

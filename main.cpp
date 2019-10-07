@@ -22,11 +22,6 @@
 
 using namespace std;
 
-/*
- * 
- */
-
-
 double rountFor(double a, int count = 6) {
     double ten = 1.0;
     for (int i = 0; i < count; ++i)
@@ -40,7 +35,8 @@ int main(int argc, char** argv) {
 
 
 
-    rapidcsv::Document doc("/home/boyko_mihail/NetBeansProjects/ML_Facebook_LinearRegression/ML_2019_FaceBookComments_LinearRegression/Dataset/Dataset/Training/Features_Variant_1.csv");
+    //rapidcsv::Document doc("/home/boyko_mihail/NetBeansProjects/ML_Facebook_LinearRegression/ML_2019_FaceBookComments_LinearRegression/Dataset/Dataset/Training/Features_Variant_1.csv");
+    rapidcsv::Document doc("/home/boyko_mihail/NetBeansProjects/ML_Facebook_LinearRegression/ML_2019_FaceBookComments_LinearRegression/Features_new.csv");
 
     int crossValCount = doc.GetRowCount() / 5;
     std::vector<double> RMSE_results(0);
@@ -50,10 +46,6 @@ int main(int argc, char** argv) {
     std::vector<std::vector<double>> All(0);
     for (int i = 0; i < doc.GetRowCount(); ++i) {
         std::vector<double> newX = doc.GetRow<double>(i);
-        auto y_t = newX.back();
-        newX.pop_back();
-        newX.push_back(1);
-        newX.push_back(y_t);
         All.push_back(newX);
     }
 
@@ -72,19 +64,20 @@ int main(int argc, char** argv) {
         std::vector<double> newX = All[i];
         Y.push_back(newX.back());
         newX.pop_back();
-        int sizeX = newX.size();
-        for (int q = 0; q < sizeX; ++q) {
-            for (int q2 = q; q2 < sizeX; ++q2) {
-                newX.push_back(newX[q] * newX[q2]);
-            }
-        }
-        for (int w = 0; w < 24; ++w) {
-            if (w != newX[38]) {
-                newX.push_back(0);
-            } else {
-                newX.push_back(1);
-            }
-        }
+        //        int sizeX = newX.size();
+        //        for (int q = 0; q < sizeX; ++q) {
+        //            for (int q2 = q; q2 < sizeX; ++q2) {
+        //                newX.push_back(newX[q] * newX[q2]);
+        //            }
+        //        }
+        //        for (int w = 0; w < 24; ++w) {
+        //            if (w != newX[38]) {
+        //                newX.push_back(0);
+        //            } else {
+        //                newX.push_back(1);
+        //            }
+        //        }
+        //newX.push_back(1);
         X.push_back(newX);
     }
 
@@ -94,68 +87,82 @@ int main(int argc, char** argv) {
     std::vector<double> Y_train(0);
     std::vector<double>Y_test(0);
 
-    map <double, double> pXi;
-    map <pair<double, double>, double> pXiYi;
-    map <int, double> HYX;
-    map <double, double> pYi;
-    double HY = 0;
-    map < int, double> IG_YX;
+    //        map <double, double> pXi;
+    //        map <pair<double, double>, double> pXiYi;
+    //        map <int, double> HYX;
+    //        map <double, double> pYi;
+    //        double HY = 0;
+    //        map < int, double> IG_YX;
+    //    
+    //    
+    //        for (int j = 0; j < Y.size(); ++j) {
+    //            pYi[Y[j]] += 1.0;
+    //        }
+    //        for (auto it = pYi.begin(); it != pYi.end(); ++it) {
+    //            HY += ((*it).second / Y.size()) * log2(((*it).second / Y.size()));
+    //        }
+    //        HY *= -1;
+    //    
+    //        for (int j = 0; j < X[0].size(); ++j) {
+    //            for (int q = 0; q < X.size(); ++q) {
+    //                pXi[X[q][j]] += 1.0;
+    //                pXiYi[pair<double, double>(X[q][j], Y[q])] += 1.0;
+    //    
+    //            }
+    //    
+    //            for (auto it = pXi.begin(); it != pXi.end(); ++it) {
+    //                double tempSumm = 0;
+    //                for (auto ity = pXiYi.begin(); ity != pXiYi.end(); ++ity) {
+    //                    if ((*ity).first.first == (*it).first) {
+    //                        tempSumm += ((*ity).second / (*it).second) * log2((*ity).second / (*it).second);
+    //                    }
+    //                }
+    //                tempSumm *= -1;
+    //                HYX[j] += ((*it).second / X.size()) * tempSumm;
+    //            }
+    //            //HYX[j] *= -1;
+    //            pXi.clear();
+    //            pXiYi.clear();
+    //        }
+    //        for (auto it = HYX.begin(); it != HYX.end(); ++it) {
+    //            IG_YX[(*it).first] = HY - (*it).second;
+    //        }
+    //    
+    //        //    auto cmp = [](std::pair<int, double> const & a, std::pair<int, double> const & b){
+    //        //        return a.second != b.second? a.second < b.second : a.first < b.first;
+    //        //    };
+    //        //    std::sort(IG_YX.begin(), IG_YX.end(), cmp);
+    //    
+    //        for (auto it = IG_YX.begin(); it != IG_YX.end(); ++it) {
+    //            cout << "IG_YX[" << (*it).first << "] = " << (*it).second << endl;
+    //        }
+    //        cout << "HY = " << HY << endl;
+    //    
+    //        for (int i = 0; i < X.size(); ++i) {
+    //    
+    //            std::vector<double> newX(0);
+    //            for (int j = 0; j < X[i].size(); ++j) {
+    //                if (IG_YX[j] > 0.65 || j == X[i].size() - 1) {
+    //                    newX.push_back(X[i][j]);
+    //                }
+    //            }
+    //            XUpdateFeatures.push_back(newX);
+    //        }
+    //        X = XUpdateFeatures;
+    //    
+    //     std::ofstream myfileFeauters;
+    //    myfileFeauters.open("/home/boyko_mihail/NetBeansProjects/ML_Facebook_LinearRegression/ML_2019_FaceBookComments_LinearRegression/Features_new2.csv");
+    //
+    //    for (int i = 0; i < X.size(); i++) {
+    //        for (int j = 0; j < X[i].size(); j++) {
+    //            myfileFeauters << X[i][j] << ",";
+    //        }
+    //        myfileFeauters << Y[i];
+    //        myfileFeauters<<"\n";
+    //    }
 
+    // myfileFeauters.close();
 
-    for (int j = 0; j < Y.size(); ++j) {
-        pYi[Y[j]] += 1.0;
-    }
-    for (auto it = pYi.begin(); it != pYi.end(); ++it) {
-        HY += ((*it).second / Y.size()) * log2(((*it).second / Y.size()));
-    }
-    HY *= -1;
-
-    for (int j = 0; j < X[0].size(); ++j) {
-        for (int q = 0; q < X.size(); ++q) {
-            pXi[X[q][j]] += 1.0;
-            pXiYi[pair<double, double>(X[q][j], Y[q])] += 1.0;
-
-        }
-
-        for (auto it = pXi.begin(); it != pXi.end(); ++it) {
-            double tempSumm = 0;
-            for (auto ity = pXiYi.begin(); ity != pXiYi.end(); ++ity) {
-                if ((*ity).first.first == (*it).first) {
-                    tempSumm += ((*ity).second / (*it).second) * log2((*ity).second / (*it).second);
-                }
-            }
-            tempSumm *= -1;
-            HYX[j] += ((*it).second / X.size()) * tempSumm;
-        }
-        //HYX[j] *= -1;
-        pXi.clear();
-        pXiYi.clear();
-    }
-    for (auto it = HYX.begin(); it != HYX.end(); ++it) {
-        IG_YX[(*it).first] = HY - (*it).second;
-    }
-
-    //    auto cmp = [](std::pair<int, double> const & a, std::pair<int, double> const & b){
-    //        return a.second != b.second? a.second < b.second : a.first < b.first;
-    //    };
-    //    std::sort(IG_YX.begin(), IG_YX.end(), cmp);
-
-    for (auto it = IG_YX.begin(); it != IG_YX.end(); ++it) {
-        cout << "IG_YX[" << (*it).first << "] = " << (*it).second << endl;
-    }
-    cout << "HY = " << HY << endl;
-
-    for (int i = 0; i < X.size(); ++i) {
-
-        std::vector<double> newX(0);
-        for (int j = 0; j < X[i].size(); ++j) {
-            if (IG_YX[j] > 0.8 || j == X[i].size() - 1) {
-                newX.push_back(X[i][j]);
-            }
-        }
-        XUpdateFeatures.push_back(newX);
-    }
-    X = XUpdateFeatures;
 
     clock_t start = clock();
     for (int i = 0; i < 5; i++) {
@@ -165,21 +172,11 @@ int main(int argc, char** argv) {
         Y_train.clear();
         Y_test.clear();
 
-
-
         for (int j = 0; j < X.size(); j++) {
 
             if (j < crossValCount * i || j >= crossValCount * (i + 1)) {
                 X_train.push_back(X[j]);
-                //                if (abs(Y[j] - m) < 3 * sig) {
                 Y_train.push_back(Y[j]);
-                //                } else {
-                //                    if (Y[j] - m > 3 * sig) {
-                //                        Y_train.push_back( m + 3 * sig );
-                //                    } else if (Y[j] - m < -(3 * sig)) {
-                //                        Y_train.push_back( m - 3 * sig );
-                //                    }
-                //                }
             } else {
                 X_test.push_back(X[j]);
                 Y_test.push_back(Y[j]);
@@ -190,7 +187,11 @@ int main(int argc, char** argv) {
         // BATCH SIZE 60 PARAM = 0.1, 110, 60
         // BACH SIZE 1000 PARAM = 0.2, 220, 1000
         // BACH SIZE 1000 PARAM = 0.5, 400, 10000
-        LinearRegression model(0.2, 250, 1000, Regularization::NONE);
+
+        // new features param = 0.38, 70, 1000
+        // old features param without ingen = 0.7, 140, 1000
+        // old feature param with ingen = 2.7, 220, 1000 (0.6)
+        LinearRegression model(0.38, 150, 1000, Regularization::NONE);
         clock_t start2 = clock();
         model.fit(X_train, Y_train);
         clock_t end2 = clock();
@@ -205,8 +206,6 @@ int main(int argc, char** argv) {
 
         cout << "result RMSE trening iteretion #" << i << " = " << result_RMSE << endl;
         cout << "result R^2 trening iteretion #" << i << " = " << result_R2 << endl;
-
-
 
         auto Y_pred_test = model.predict(X_test);
         double result_RMSE_test = RMSE_metric::calculateMetric(Y_pred_test, Y_test);
@@ -243,7 +242,7 @@ int main(int argc, char** argv) {
 
 
     std::ofstream myfile;
-    myfile.open("/home/boyko_mihail/NetBeansProjects/ML_Facebook_LinearRegression/ML_2019_FaceBookComments_LinearRegression/Features_enginering_2.csv");
+    myfile.open("/home/boyko_mihail/NetBeansProjects/ML_Facebook_LinearRegression/ML_2019_FaceBookComments_LinearRegression/Features_enginering_6.csv");
     myfile << ",1,2,3,4,5,E,SD,\n";
     myfile << "RMSE," << (RMSE_results[0]) << "," << (RMSE_results[1]) << "," << (RMSE_results[2]) << "," << (RMSE_results[3]) << "," << (RMSE_results[4]) << "," << RMSE_M << "," << RMSE_sig << ",\n";
     myfile << "R^2," << (R2_results[0]) << "," << (R2_results[1]) << "," << (R2_results[2]) << "," << (R2_results[3]) << "," << (R2_results[4]) << "," << R2_M << "," << R2_sig << ",\n";
@@ -262,6 +261,8 @@ int main(int argc, char** argv) {
     }
 
     myfile.close();
+
+
 
     return 0;
 }
