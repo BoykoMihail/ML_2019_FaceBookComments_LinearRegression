@@ -19,6 +19,7 @@
 #include "Statistic.h"
 #include <time.h>
 #include <map>
+#include <sstream>
 
 using namespace std;
 
@@ -36,19 +37,26 @@ int main(int argc, char** argv) {
 
 
     //rapidcsv::Document doc("/home/boyko_mihail/NetBeansProjects/ML_Facebook_LinearRegression/ML_2019_FaceBookComments_LinearRegression/Dataset/Dataset/Training/Features_Variant_1.csv");
-    rapidcsv::Document doc("/home/boyko_mihail/NetBeansProjects/ML_Facebook_LinearRegression/ML_2019_FaceBookComments_LinearRegression/Features_new.csv");
+    rapidcsv::Document doc("/home/boyko_mihail/NetBeansProjects/ML_Facebook_LinearRegression/ML_2019_FaceBookComments_LinearRegression/Features_new2.csv");
 
     int crossValCount = doc.GetRowCount() / 5;
     std::vector<double> RMSE_results(0);
     std::vector<double> R2_results(0);
-    std::vector<std::vector<double>> all_W(0);
+    std::vector<std::vector<double>> all_W(0); 
+    map <int, string> labelFeatures;
+
+    std::vector<string> newXlabel = doc.GetRow<string>(0);
+
+   
+    for (int i = 0; i < newXlabel.size(); ++i) {
+        labelFeatures[i] = newXlabel[i];
+    }
 
     std::vector<std::vector<double>> All(0);
-    for (int i = 0; i < doc.GetRowCount(); ++i) {
+    for (int i = 1; i < doc.GetRowCount(); ++i) {
         std::vector<double> newX = doc.GetRow<double>(i);
         All.push_back(newX);
     }
-
     std::random_device rd;
     std::mt19937 g(rd());
 
@@ -59,7 +67,13 @@ int main(int argc, char** argv) {
     std::vector<std::vector<double>> XUpdateFeatures(0);
     std::vector<double> Y(0);
 
-
+   
+    //
+    //    for (int i = 0; i < All[0].size() - 1; ++i) {
+    //        std::ostringstream oss;
+    //        oss << "X[" << i << "]";
+    //        labelFeatures[i] = oss.str();
+    //    }
     for (int i = 0; i < All.size(); ++i) {
         std::vector<double> newX = All[i];
         Y.push_back(newX.back());
@@ -68,6 +82,9 @@ int main(int argc, char** argv) {
         //        for (int q = 0; q < sizeX; ++q) {
         //            for (int q2 = q; q2 < sizeX; ++q2) {
         //                newX.push_back(newX[q] * newX[q2]);
+        //                std::ostringstream oss;
+        //                oss << labelFeatures[q] << " * " << labelFeatures[q2] << "";
+        //                labelFeatures[newX.size() - 1] = oss.str();
         //            }
         //        }
         //        for (int w = 0; w < 24; ++w) {
@@ -77,7 +94,8 @@ int main(int argc, char** argv) {
         //                newX.push_back(1);
         //            }
         //        }
-        //newX.push_back(1);
+        //        newX.push_back(1);
+        //labelFeatures[newX.size() - 1] = "X_0";
         X.push_back(newX);
     }
 
@@ -87,81 +105,97 @@ int main(int argc, char** argv) {
     std::vector<double> Y_train(0);
     std::vector<double>Y_test(0);
 
-    //        map <double, double> pXi;
-    //        map <pair<double, double>, double> pXiYi;
-    //        map <int, double> HYX;
-    //        map <double, double> pYi;
-    //        double HY = 0;
-    //        map < int, double> IG_YX;
-    //    
-    //    
-    //        for (int j = 0; j < Y.size(); ++j) {
-    //            pYi[Y[j]] += 1.0;
+    //    map <double, double> pXi;
+    //    map <pair<double, double>, double> pXiYi;
+    //    map <int, double> HYX;
+    //    map <double, double> pYi;
+    //    double HY = 0;
+    //    map < int, double> IG_YX;
+
+
+    //    for (int j = 0; j < Y.size(); ++j) {
+    //        pYi[Y[j]] += 1.0;
+    //    }
+    //    for (auto it = pYi.begin(); it != pYi.end(); ++it) {
+    //        HY += ((*it).second / Y.size()) * log2(((*it).second / Y.size()));
+    //    }
+    //    HY *= -1;
+    //
+    //    for (int j = 0; j < X[0].size(); ++j) {
+    //        for (int q = 0; q < X.size(); ++q) {
+    //            pXi[X[q][j]] += 1.0;
+    //            pXiYi[pair<double, double>(X[q][j], Y[q])] += 1.0;
+    //
     //        }
-    //        for (auto it = pYi.begin(); it != pYi.end(); ++it) {
-    //            HY += ((*it).second / Y.size()) * log2(((*it).second / Y.size()));
-    //        }
-    //        HY *= -1;
-    //    
-    //        for (int j = 0; j < X[0].size(); ++j) {
-    //            for (int q = 0; q < X.size(); ++q) {
-    //                pXi[X[q][j]] += 1.0;
-    //                pXiYi[pair<double, double>(X[q][j], Y[q])] += 1.0;
-    //    
-    //            }
-    //    
-    //            for (auto it = pXi.begin(); it != pXi.end(); ++it) {
-    //                double tempSumm = 0;
-    //                for (auto ity = pXiYi.begin(); ity != pXiYi.end(); ++ity) {
-    //                    if ((*ity).first.first == (*it).first) {
-    //                        tempSumm += ((*ity).second / (*it).second) * log2((*ity).second / (*it).second);
-    //                    }
-    //                }
-    //                tempSumm *= -1;
-    //                HYX[j] += ((*it).second / X.size()) * tempSumm;
-    //            }
-    //            //HYX[j] *= -1;
-    //            pXi.clear();
-    //            pXiYi.clear();
-    //        }
-    //        for (auto it = HYX.begin(); it != HYX.end(); ++it) {
-    //            IG_YX[(*it).first] = HY - (*it).second;
-    //        }
-    //    
-    //        //    auto cmp = [](std::pair<int, double> const & a, std::pair<int, double> const & b){
-    //        //        return a.second != b.second? a.second < b.second : a.first < b.first;
-    //        //    };
-    //        //    std::sort(IG_YX.begin(), IG_YX.end(), cmp);
-    //    
-    //        for (auto it = IG_YX.begin(); it != IG_YX.end(); ++it) {
-    //            cout << "IG_YX[" << (*it).first << "] = " << (*it).second << endl;
-    //        }
-    //        cout << "HY = " << HY << endl;
-    //    
-    //        for (int i = 0; i < X.size(); ++i) {
-    //    
-    //            std::vector<double> newX(0);
-    //            for (int j = 0; j < X[i].size(); ++j) {
-    //                if (IG_YX[j] > 0.65 || j == X[i].size() - 1) {
-    //                    newX.push_back(X[i][j]);
+    //
+    //        for (auto it = pXi.begin(); it != pXi.end(); ++it) {
+    //            double tempSumm = 0;
+    //            for (auto ity = pXiYi.begin(); ity != pXiYi.end(); ++ity) {
+    //                if ((*ity).first.first == (*it).first) {
+    //                    tempSumm += ((*ity).second / (*it).second) * log2((*ity).second / (*it).second);
     //                }
     //            }
-    //            XUpdateFeatures.push_back(newX);
+    //            tempSumm *= -1;
+    //            HYX[j] += ((*it).second / X.size()) * tempSumm;
     //        }
-    //        X = XUpdateFeatures;
-    //    
-    //     std::ofstream myfileFeauters;
+    //        //HYX[j] *= -1;
+    //        pXi.clear();
+    //        pXiYi.clear();
+    //    }
+    //    for (auto it = HYX.begin(); it != HYX.end(); ++it) {
+    //        IG_YX[(*it).first] = HY - (*it).second;
+    //    }
+    //
+    //    //    auto cmp = [](std::pair<int, double> const & a, std::pair<int, double> const & b){
+    //    //        return a.second != b.second? a.second < b.second : a.first < b.first;
+    //    //    };
+    //    //    std::sort(IG_YX.begin(), IG_YX.end(), cmp);
+    //
+    //    for (auto it = IG_YX.begin(); it != IG_YX.end(); ++it) {
+    //        cout << "IG_YX[" << (*it).first << "] = " << (*it).second << endl;
+    //    }
+    //    cout << "HY = " << HY << endl;
+    //
+    //    map <int, string> newlabelFeatures;
+    //    int indexnewLabel = 0;
+    //    for (int j = 0; j < X[0].size(); ++j) {
+    //        if (IG_YX[j] > 0.7 || j == X[0].size() - 1) {
+    //            newlabelFeatures[indexnewLabel] = labelFeatures[j];
+    //            ++indexnewLabel;
+    //        }
+    //    }
+    //    labelFeatures = newlabelFeatures;
+    //
+    //    for (int i = 0; i < X.size(); ++i) {
+    //        std::vector<double> newX(0);
+    //        for (int j = 0; j < X[i].size(); ++j) {
+    //            if (IG_YX[j] > 0.7 || j == X[i].size() - 1) {
+    //                newX.push_back(X[i][j]);
+    //            }
+    //        }
+    //        XUpdateFeatures.push_back(newX);
+    //    }
+    //
+    //    X = XUpdateFeatures;
+
+    //    std::ofstream myfileFeauters;
     //    myfileFeauters.open("/home/boyko_mihail/NetBeansProjects/ML_Facebook_LinearRegression/ML_2019_FaceBookComments_LinearRegression/Features_new2.csv");
     //
+    //    for (int j = 0; j < X[0].size(); j++) {
+    //        myfileFeauters << labelFeatures[j] << ",";
+    //    }
+    //    myfileFeauters << ",";
+    //    myfileFeauters << "\n";
+
     //    for (int i = 0; i < X.size(); i++) {
     //        for (int j = 0; j < X[i].size(); j++) {
     //            myfileFeauters << X[i][j] << ",";
     //        }
     //        myfileFeauters << Y[i];
-    //        myfileFeauters<<"\n";
+    //        myfileFeauters << "\n";
     //    }
 
-    // myfileFeauters.close();
+    //    myfileFeauters.close();
 
 
     clock_t start = clock();
@@ -191,7 +225,7 @@ int main(int argc, char** argv) {
         // new features param = 0.38, 70, 1000
         // old features param without ingen = 0.7, 140, 1000
         // old feature param with ingen = 2.7, 220, 1000 (0.6)
-        LinearRegression model(0.38, 150, 1000, Regularization::NONE);
+        LinearRegression model(0.35, 520, 1000, Regularization::NONE);
         clock_t start2 = clock();
         model.fit(X_train, Y_train);
         clock_t end2 = clock();
@@ -242,7 +276,7 @@ int main(int argc, char** argv) {
 
 
     std::ofstream myfile;
-    myfile.open("/home/boyko_mihail/NetBeansProjects/ML_Facebook_LinearRegression/ML_2019_FaceBookComments_LinearRegression/Features_enginering_6.csv");
+    myfile.open("/home/boyko_mihail/NetBeansProjects/ML_Facebook_LinearRegression/ML_2019_FaceBookComments_LinearRegression/Features_enginering_8.csv");
     myfile << ",1,2,3,4,5,E,SD,\n";
     myfile << "RMSE," << (RMSE_results[0]) << "," << (RMSE_results[1]) << "," << (RMSE_results[2]) << "," << (RMSE_results[3]) << "," << (RMSE_results[4]) << "," << RMSE_M << "," << RMSE_sig << ",\n";
     myfile << "R^2," << (R2_results[0]) << "," << (R2_results[1]) << "," << (R2_results[2]) << "," << (R2_results[3]) << "," << (R2_results[4]) << "," << R2_M << "," << R2_sig << ",\n";
@@ -257,7 +291,7 @@ int main(int argc, char** argv) {
         }
         W_i_M = W_i_M / all_W.size();
         W_i_Sig = sqrt(W_i_Sig / all_W.size() - W_i_M * W_i_M);
-        myfile << "W[" << i << "]," << all_W[0][i] << "," << all_W[1][i] << "," << all_W[2][i] << "," << all_W[3][i] << "," << all_W[4][i] << "," << W_i_M << "," << W_i_Sig << ",\n";
+        myfile << labelFeatures[i] << "," << all_W[0][i] << "," << all_W[1][i] << "," << all_W[2][i] << "," << all_W[3][i] << "," << all_W[4][i] << "," << W_i_M << "," << W_i_Sig << ",\n";
     }
 
     myfile.close();

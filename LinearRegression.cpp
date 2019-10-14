@@ -20,8 +20,6 @@
 using namespace std;
 using namespace Eigen;
 
-//using Eigen::MatrixXd;
-//using Eigen::VectorXd;
 
 LinearRegression::LinearRegression(double learning_rate, int numEpoh, int bach_size, Regularization regul) {
 
@@ -130,7 +128,7 @@ VectorXd LinearRegression::gradientDescent(MatrixXd &X, VectorXd &Y) {
                 indexCurrent = rand() % lastDiff.size();
             }
           
-            if (learning_rate > 0.000000000015) {
+            if (learning_rate > 0.0000000000000000000000015) {
                 if (lastDiff[indexCurrent] * diff[indexCurrent] <= 0) {
 //
                     learning_rate *= 0.9999999;
@@ -165,6 +163,7 @@ void LinearRegression::fit(const std::vector<std::vector<double>> &X, const std:
 
     this->W = VectorXd();
     W.setRandom(X[0].size());
+    
     
     this->gradientDescent(X_Matrix, Y_Vector);
 

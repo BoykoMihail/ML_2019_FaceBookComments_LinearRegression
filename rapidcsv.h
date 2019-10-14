@@ -498,11 +498,11 @@ namespace rapidcsv {
          */
         template<typename T>
         std::vector<T> GetRow(const size_t pRowIdx) const {
-            const ssize_t rowIdx = pRowIdx + (mLabelParams.mColumnNameIdx + 1);
+            const ssize_t rowIdx = pRowIdx + (mLabelParams.mColumnNameIdx );
             std::vector<T> row;
             Converter<T> converter(mConverterParams);
             for (auto itCol = mData.at(rowIdx).begin(); itCol != mData.at(rowIdx).end(); ++itCol) {
-                //  if (std::distance(mData.at(rowIdx).begin(), itCol) > mLabelParams.mRowNameIdx)
+                 //if (std::distance(mData.at(rowIdx).begin(), itCol) > mLabelParams.mRowNameIdx)
                 {
                     T val;
                     converter.ToVal(*itCol, val);
